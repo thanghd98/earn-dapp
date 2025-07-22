@@ -7,8 +7,8 @@ export class EarnSDK {
     public stake() { }
     public unstake() { }
     public claim() { }
-    public getStakedBalance() { }
-    public getUnstakedBalance() { }
+    public getTotalStakedBalance() { }
+    public getTotalUnstakedBalance() { }
     public getStakingRewards() { }
     public getStakingHistory() { }
 

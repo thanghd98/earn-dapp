@@ -2,6 +2,7 @@ import * as providers from './providers'
 import { BaseEarnProvider } from './core';
 import { Logger } from './libs';
 import { EIP1193Provider, InitParams } from './types/common';
+import { IStake, IUnstake } from './types';
 
 export class EarnSDK {
     private logger = new Logger('EarnSDK')
@@ -16,30 +17,46 @@ export class EarnSDK {
         this.initBuiltInProvider();
     }
 
-    public async stake(provider: string) {
+    public async stake(params: IStake & { provider: string }) {
+        const { provider, ...rest } = params
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
         }
-        await earnProvider.stake();
+        await earnProvider.stake(rest);
         this.logger.success(`Staking with provider: ${provider}`);
     }
 
-    public unstake(): void {
+    public async unstake(params: IUnstake & { provider: string }) {
         // Implementation for unstaking with Lido
+        const { provider, ...rest } = params
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return;
+        }
+        await earnProvider.unstake(rest);
+        this.logger.success(`Staking with provider: ${provider}`);
     }
 
     public claim(): void {
         // Implementation for claiming rewards with Lido
     }
 
-    public getStakedBalance(): void {
+    public async getTotalStakedBalance(): Promise<number> {
         // Implementation to get staked balance with Lido
+        return 0
     }
 
-    public getUnstakedBalance(): void {
+    public async getTotalUnstakedBalance(): Promise<number> {
         // Implementation to get unstaked balance with Lido
+        return 0
+    }
+
+    public async getUserStakedBalance(): Promise<number> {
+        // Implementation to get user staked balance with Lido
+        return 0
     }
 
     public getStakingRewards(): void {
