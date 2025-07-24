@@ -69,7 +69,6 @@ export function Rewards() {
                   submit: "Staking",
                   rebase: "Reward",
                 }
-
                 const dateNumber = Number(reward?.originalEvent?.blockTimestamp || reward?.originalEvent?.args?.reportTimestamp);
                 const date = new Date(dateNumber * 1000);
                 const formatted = date.toLocaleDateString('vi-VN')
@@ -84,27 +83,6 @@ export function Rewards() {
                   </tr>
                 )
               })}
-            {/* <tr>
-              <td className="border border-gray-300 px-4 py-2">2023-10-01</td>
-              <td className="border border-gray-300 px-4 py-2">Reward</td>
-              <td className="border border-gray-300 px-4 py-2 text-green-600">+0.0005 stETH</td>
-              <td className="border border-gray-300 px-4 py-2">1.8%</td>
-              <td className="border border-gray-300 px-4 py-2">0.00370000 stETH</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2">2023-09-30</td>
-              <td className="border border-gray-300 px-4 py-2">Reward</td>
-              <td className="border border-gray-300 px-4 py-2 text-green-600">+0.0003 stETH</td>
-              <td className="border border-gray-300 px-4 py-2">1.7%</td>
-              <td className="border border-gray-300 px-4 py-2">0.00320000 stETH</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2">2023-09-29</td>
-              <td className="border border-gray-300 px-4 py-2">Reward</td>
-              <td className="border border-gray-300 px-4 py-2 text-green-600">+0.0002 stETH</td>
-              <td className="border border-gray-300 px-4 py-2">1.6%</td>
-              <td className="border border-gray-300 px-4 py-2">0.00290000 stETH</td>
-            </tr> */}
           </tbody>
         </table>
       </div>
