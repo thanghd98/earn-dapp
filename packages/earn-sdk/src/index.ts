@@ -41,6 +41,16 @@ export class EarnSDK {
     }
 
 
+    public async getRewardsOnChain(adress: string, days: bigint, provider: string) : Promise<number> {
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return 0;
+        }
+        //@ts-expect-error
+        return await earnProvider.getRewardsOnChain(adress, days);
+    }
+
     public async getAverageAPR(provider: string) : Promise<number> {
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {

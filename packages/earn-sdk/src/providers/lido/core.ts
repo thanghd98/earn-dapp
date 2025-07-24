@@ -131,7 +131,6 @@ export class LidoProvider extends BaseEarnProvider {
         const currentBalance = this.sdk.core.balanceETH();
         this.logger?.info(`Current ETH balance: ${currentBalance}`);
         return 0; // Return the staked balance
-        
     }
 
     public async getTotalUnstakedBalance(): Promise<number> {
@@ -164,6 +163,34 @@ export class LidoProvider extends BaseEarnProvider {
         }
     }
 
+    public async getRewardAverageAPR(): Promise<number> {
+        try {
+            const smaApr = await this.sdk.statistics.apr.getSmaApr({ days: 7 })
+
+            return smaApr;
+        } catch (error) {
+            console.log("🚀 ~ LidoProvider ~ getAverageAPR ~ error:", error)
+            return 0
+        }
+    }
+
+    public async getRewardsOnChain(address: string, day: bigint = 7n): Promise<unknown> {
+        try {
+            const rewardsQuery = await this.sdk.rewards.getRewardsFromChain({
+                address: address as any,
+                stepBlock: 10000, // defaults to 50000, max block range per 1 query
+                back: {
+                  days: day, // defaults to 7 days
+                },
+              });
+
+              return rewardsQuery;
+        } catch (error) {
+            console.log("🚀 ~ LidoProvider ~ getRewardsOnChain ~ error:", error);
+            return null; // Ensure a value is returned in the catch block
+        }
+    }
+
     // public async getEstimatedFee(params: IStake): Promise<number> {
     //     const { referralAddress, amount } = params
     //     console.log("🚀 ~ LidoProvider ~ getEstimatedFee ~ amount:", amount)
@@ -184,17 +211,7 @@ export class LidoProvider extends BaseEarnProvider {
     //     }
     // }
 
-    // public async getRewardsOnChain(address: string, day: bigint = 7n): Promise<void> {
-    //     const rewardsQuery = await this.sdk.rewards.getRewardsFromChain({
-    //         address: address as any,
-    //         stepBlock: 10000, // defaults to 50000, max block range per 1 query
-    //         back: {
-    //           days: day, // defaults to 7 days
-    //         },
-    //       });
-          
-    //       console.log(rewardsQuery.rewards);
-    // }
+
 }
 
 // public async getRewardsOnChain(address: string, day: bigint = 7n): Promise<GetRewardsFromChainResult> {

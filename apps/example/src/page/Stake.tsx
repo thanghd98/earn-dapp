@@ -15,7 +15,7 @@ export function Stake() {
     const { data: ethBalance } = useBalance({ address })
     const { data: sEthBalance } = useBalance({ address, token: sETH_CONTRACT_ADDRESS })
   
-    const { rewardApr } = useReward()
+    const { apr } = useReward(address as string)
   
     const onStaking = async (data: { amount: string }) => {
       const result = await earnSDK.stake({
@@ -39,10 +39,10 @@ export function Stake() {
     return (
         <div className="p-8 flex flex-col items-center">
             <div className="flex flex-col gap-2">
-            <h1 className="text-center text-4xl font-semibold">Stake ETH</h1>
-            <p className="text-center">
-                Stake ETH and receive stETH while staking
-            </p>
+                <h1 className="text-center text-4xl font-semibold">Stake ETH</h1>
+                <p className="text-center">
+                    Stake ETH and receive stETH while staking
+                </p>
             </div>
             <form
             className="flex flex-col gap-4 justify-center items-center rounded-2xl border bor w-1/3 mt-8 p-4"
@@ -80,7 +80,7 @@ export function Stake() {
                         />
                         </div>
                     </div>
-                    <p className="text-xl font-semibold text-green-600">{rewardApr?.toFixed(1)}%</p>
+                    <p className="text-xl font-semibold text-green-600">{apr?.toFixed(1)}%</p>
                     </div>
                 </div>
                 )
