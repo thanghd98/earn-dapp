@@ -11,10 +11,10 @@ export class LidoProvider extends BaseEarnProvider {
     constructor(private logger?: Logger, private web3Provider?: EIP1193Provider) {
         super(logger, web3Provider);
         this.sdk = new LidoSDK({
-            chainId: 17000,
-            rpcUrls: ["https://ethereum-holesky-rpc.publicnode.com"],
+            chainId: 560048,
+            rpcUrls: ["https://rpc.hoodi.ethpandaops.io"],
             //@ts-expect-error
-            web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum)
+            web3Provider: LidoSDKCore.createWeb3Provider(560048, window.ethereum)
         })
     }
 
@@ -152,4 +152,89 @@ export class LidoProvider extends BaseEarnProvider {
         // Implementation to get staking history with Lido
         return {};
     }
+
+    public async getAverageAPR(): Promise<number> {
+        try {
+            const smaApr = await this.sdk.statistics.apr.getSmaApr({ days: 7 })
+
+            return smaApr;
+        } catch (error) {
+            console.log("🚀 ~ LidoProvider ~ getAverageAPR ~ error:", error)
+            return 0
+        }
+    }
+
+    // public async getEstimatedFee(params: IStake): Promise<number> {
+    //     const { referralAddress, amount } = params
+    //     console.log("🚀 ~ LidoProvider ~ getEstimatedFee ~ amount:", amount)
+    //     console.log("🚀 ~ LidoProvider ~ getEstimatedFee ~ referralAddress:", referralAddress)
+    //     try {
+    //         const stakeEstimated = await this.sdk.stake.stakeEthEstimateGas(
+    //             {
+    //                 value: amount,
+    //                 referralAddress: referralAddress as any,
+    //             }
+    //         );
+    //         console.log("🚀 ~ LidoProvider ~ getEstimatedFee ~ stakeEstimated:", stakeEstimated)
+
+    //         return Number(stakeEstimated); // Return the estimated gas price
+    //     } catch (error) {
+    //         console.log("🚀 ~ LidoProvider ~ getEstimatedFee ~ error:", error)
+    //         return 0
+    //     }
+    // }
+
+    // public async getRewardsOnChain(address: string, day: bigint = 7n): Promise<void> {
+    //     const rewardsQuery = await this.sdk.rewards.getRewardsFromChain({
+    //         address: address as any,
+    //         stepBlock: 10000, // defaults to 50000, max block range per 1 query
+    //         back: {
+    //           days: day, // defaults to 7 days
+    //         },
+    //       });
+          
+    //       console.log(rewardsQuery.rewards);
+    // }
 }
+
+// public async getRewardsOnChain(address: string, day: bigint = 7n): Promise<GetRewardsFromChainResult> {
+//     console.log("🚀 ~ LidoProvider ~ getRewardsOnChain ~ day:", day)
+//     console.log("🚀 ~ LidoProvider ~ getRewardsOnChain ~ address:", address)
+//     try {
+//         const rewardsQuery = await this.sdk.rewards.getRewardsFromChain({
+//             address: address as any,
+//             stepBlock: 10,
+//             back: {
+//               days: day,
+//             },
+//           });
+//         console.log("🚀 ~ LidoProvider ~ getRewardsOnChain ~ rewardsQuery:", rewardsQuery)
+        
+    //         return rewardsQuery;
+        
+    //     } catch (error) {
+//         console.log("🚀 ~ LidoProvider ~ getRewardsOnChain ~ error:", error)
+//         throw new Error(`Failed to get rewards on chain: ${(error as SDKError).errorMessage}`);
+//     }
+// }
+
+
+
+// console.log("🚀 ~ LidoProvider ~ getAverageAPR ~ smaApr:", smaApr)
+// const response = await fetch('https://eth-api-hoodi.testnet.fi/v1/protocol/steth/apr/sma');
+
+// const { data } = await response.json();
+// console.log("🚀 ~ LidoProvider ~ getAverageAPR ~ data:", data)
+
+// const rewards = data.aprs;
+
+// // const now = Math.floor(Date.now() / 1000); // current time in seconds
+// // const sevenDaysAgo = now - 7 * 24 * 60 * 60;
+
+// // const recentAPR = aprs.filter((item: any) => item.timeUnix >= sevenDaysAgo);
+// // console.log("🚀 ~ LidoProvider ~ getAverageAPR ~ recentAPR:", recentAPR)
+
+// const totalAPR = rewards.reduce(
+//     (acc: number, reward: any) => acc + reward.apr,
+//     0,
+// );

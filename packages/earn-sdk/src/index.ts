@@ -24,8 +24,8 @@ export class EarnSDK {
             this.logger.error(`Provider ${provider} not found`);
             return;
         }
-        await earnProvider.stake(rest);
         this.logger.success(`Staking with provider: ${provider}`);
+        return await earnProvider.stake(rest);
     }
 
     public async unstake(params: IUnstake & { provider: string }) {
@@ -38,6 +38,17 @@ export class EarnSDK {
         }
         await earnProvider.unstake(rest);
         this.logger.success(`Staking with provider: ${provider}`);
+    }
+
+
+    public async getAverageAPR(provider: string) : Promise<number> {
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return 0;
+        }
+        //@ts-expect-error
+        return await earnProvider.getAverageAPR();
     }
 
     public claim(): void {
