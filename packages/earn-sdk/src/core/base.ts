@@ -6,7 +6,7 @@ export abstract class BaseEarnProvider{
     public abstract name: string;
     public abstract stake(params: IStake): string | Promise<string>;
     public abstract unstake(params: IUnstake): Promise<string>;
-    public abstract claim(): void;
+    public abstract claim(requestsIds: bigint[]): Promise<string>;
     public abstract getTotalStakedBalance(): Promise<number>;
     public abstract getTotalUnstakedBalance(): Promise<number>;
     public abstract getUserStakedBalance(): Promise<number>;

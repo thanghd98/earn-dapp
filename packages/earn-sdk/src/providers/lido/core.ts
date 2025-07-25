@@ -123,8 +123,86 @@ export class LidoProvider extends BaseEarnProvider {
         }
     }
 
-    public claim(): void {
+    public async getWithdrawalRequestsIds(address: string): Promise<unknown> {
+        try {
+            const requests = await this.sdk.withdraw.requestsInfo.getPendingRequestsInfo({
+                account: address as any,
+            });
+            return requests;
+        } catch (error) {
+            console.error("Error fetching withdrawal requests IDs:", error);
+            throw new Error(`Failed to get withdrawal requests IDs: ${(error as SDKError).errorMessage}`);
+        }
+    }
+
+    public async getClaimableRequestsIds(address: string): Promise<unknown> {
+        try {
+            const requests = await this.sdk.withdraw.requestsInfo.getClaimableRequestsInfo({
+                account: address as any,
+            });
+            return requests;
+        } catch (error) {
+            console.error("Error fetching withdrawal requests IDs:", error);
+            throw new Error(`Failed to get withdrawal requests IDs: ${(error as SDKError).errorMessage}`);
+        }
+    }
+
+    public async getClaimTimeEstimated(ids: string[]): Promise<number> {
+        try {
+            const idsString = ids.join(',');
+
+            const response = await fetch(`https://wq-api-hoodi.testnet.fi/v2/request-time?ids=${idsString}`)
+            const data = await response.json();
+
+            return data
+        } catch (error) {
+            console.error("Error fetching estimated claim time:", error);
+            throw new Error(`Failed to get estimated claim time: ${(error as SDKError).errorMessage}`);
+        }
+    }
+
+    public async claim(requestsIds: bigint[]): Promise<string> {
         // Implementation for claiming rewards with Lido
+
+        const callback = ({ stage, payload }: { stage: TransactionCallbackStage; payload?: unknown }) => {
+            switch (stage) {
+                case TransactionCallbackStage.GAS_LIMIT:
+                console.log('wait for gas limit');
+                break;
+                case TransactionCallbackStage.SIGN:
+                console.log('wait for sign');
+                break;
+                case TransactionCallbackStage.RECEIPT:
+                console.log('wait for receipt');
+                console.log(payload, 'transaction hash');
+                break;
+                case TransactionCallbackStage.CONFIRMATION:
+                console.log('wait for confirmation');
+                console.log(payload, 'transaction receipt');
+                break;
+                case TransactionCallbackStage.DONE:
+                console.log('done');
+                console.log(payload, 'transaction confirmations');
+                break;
+                case TransactionCallbackStage.ERROR:
+                console.log('error');
+                console.log(payload, 'error object with code and message');
+                break;
+                default:
+            }
+        };
+
+        try {
+            const claimTx = await this.sdk.withdraw.claim.claimRequests({
+                requestsIds,
+                callback,
+            });
+
+            return claimTx.hash; // Return the transaction hash
+            
+        } catch (error) {
+            throw new Error(`Failed to claim with Lido: ${(error as SDKError).errorMessage}`);
+        }
     }
 
     public async getTotalStakedBalance():  Promise<number>{

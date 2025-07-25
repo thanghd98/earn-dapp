@@ -68,6 +68,7 @@ export function Rewards() {
                 const type = {
                   submit: "Staking",
                   rebase: "Reward",
+                  withdrawal: "Withdrawal"
                 }
                 const dateNumber = Number(reward?.originalEvent?.blockTimestamp || reward?.originalEvent?.args?.reportTimestamp);
                 const date = new Date(dateNumber * 1000);
@@ -77,7 +78,7 @@ export function Rewards() {
                   <tr className="hover:bg-gray-50">
                     <td className="border border-gray-300 px-4 py-2">{formatted}</td>
                     <td className="border border-gray-300 px-4 py-2">{type[reward.type]}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-green-600">{(Number(reward.change) / 10**18).toFixed(8)}</td>
+                    <td className={`border border-gray-300 px-4 py-2 ${Number(reward.change) > 0 ? "text-green-600" : "text-red-600"}`}>{(Number(reward.change) / 10**18).toFixed(8)}</td>
                     <td className="border border-gray-300 px-4 py-2">{reward.apr || "-"}</td>
                     <td className="border border-gray-300 px-4 py-2">{(Number(reward.balance) / 10**18).toFixed(8)}</td>
                   </tr>

@@ -2,23 +2,65 @@ import { Clock } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAccount, useBalance } from "wagmi";
+import { earnSDK } from "../services";
+import { toast } from "react-toastify";
+import { useWithdrawals } from "../hooks/useWithdrawals";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
 export function Withdrawals() {
   const { address, isConnected } = useAccount();
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, register, setValue } = useForm();
 
   const [tab, setTab] = useState("request");
+
+  const { pendingRequests, claimableRequests, timeEstimated } = useWithdrawals(address as string);
 
   const { data: sEthBalance } = useBalance({
     address,
     token: sETH_CONTRACT_ADDRESS,
   });
 
-  const onStaking = async (data: { amount: string }) => {
-    
+  const onWithdrawRequest = async (data: { amount: string }) => {
+    const hash = await earnSDK.unstake({
+      provider: "LidoProvider",
+      amount: data.amount,
+      token: "stETH", // or "wstETH"
+    });
+
+    toast.success(
+      <div>
+        <p className="font-sm">Transaction successfully</p>
+        <p className="text-xs truncate max-w-[250px]">{hash}</p>
+      </div>,
+      {
+        onClick: () => {
+          window.open(`https://hoodi.etherscan.io/tx/${hash}`, "_blank");
+        },
+        position: "bottom-right",
+      }
+    );
   };
+
+  const onClaim = async (data: any) => {
+    const claimRequestFilter = await data.claimRequests.filter((request: any) => request.checked) || [];
+    const ids = claimRequestFilter.map((request: any) => request.id);
+  
+    const hash = await earnSDK.claim( ids, "LidoProvider" );
+
+    toast.success(
+      <div>
+        <p className="font-sm">Transaction successfully</p>
+        <p className="text-xs truncate max-w-[250px]">{hash}</p>
+      </div>,
+      {
+        onClick: () => {
+          window.open(`https://hoodi.etherscan.io/tx/${hash}`, "_blank");
+        },
+        position: "bottom-right",
+      }
+    );
+  }
 
   const requestWithdrawal = () => {
     return (
@@ -26,7 +68,7 @@ export function Withdrawals() {
         className="flex flex-col gap-4 justify-center items-center rounded-2xl border bor w-1/3 mt-8 p-4"
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-expect-error
-        onSubmit={handleSubmit(onStaking)}
+        onSubmit={handleSubmit(onWithdrawRequest)}
       >
         {isConnected && (
           <div className="w-full">
@@ -36,6 +78,33 @@ export function Withdrawals() {
                 <p className="text-xl font-semibold">
                   {(Number(sEthBalance?.value) / 10 ** 18).toFixed(4)} stETH
                 </p>
+              </div>
+              <div>
+                <div className="flex items-center flex-col gap-2">
+                  <p className="text-sm text-left">My requests</p>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="orangeCheckbox"
+                          checked
+                          className="w-4 h-4 accent-orange-500"
+                        />
+                        <label className="text-sm font-semibold">{pendingRequests?.pendingRequests?.length || 0}</label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="orangeCheckbox"
+                          checked
+                          className="w-4 h-4 accent-green-500"
+                        />
+                        <p className="text-sm font-semibold">{claimableRequests?.claimableRequests?.length || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -98,9 +167,7 @@ export function Withdrawals() {
     return (
       <form
         className="flex flex-col gap-4 justify-center items-center rounded-2xl border bor w-1/3 mt-8 p-4"
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-expect-error
-        onSubmit={handleSubmit(onStaking)}
+        onSubmit={handleSubmit(onClaim)}
       >
         {isConnected && (
           <div className="w-full">
@@ -125,7 +192,7 @@ export function Withdrawals() {
                           checked
                           className="w-4 h-4 accent-orange-500"
                         />
-                        <label className="text-sm font-semibold">1</label>
+                        <label className="text-sm font-semibold">{pendingRequests?.pendingRequests?.length || 0}</label>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
@@ -134,7 +201,7 @@ export function Withdrawals() {
                           checked
                           className="w-4 h-4 accent-green-500"
                         />
-                        <p className="text-sm font-semibold">0</p>
+                        <p className="text-sm font-semibold">{claimableRequests?.claimableRequests?.length || 0}</p>
                       </div>
                     </div>
                   </div>
@@ -142,26 +209,44 @@ export function Withdrawals() {
               </div>
               <div>
                 <p className="text-sm text-left">My pending amount</p>
-                <p className="text-xl font-semibold">0.001 stETH</p>
+                <p className="text-xl font-semibold">{Number(pendingRequests?.pendingAmountStETH) / 10**18} stETH</p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="flex justify-between items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 w-full">
-          <div className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              id="orangeCheckbox"
-              
-              className="w-4 h-4 accent-green-500"
-            />
-            <p>0.001 stETH</p>
-          </div>
-          <div className="flex items-center gap-2 bg-orange-200 px-2 rounded-2xl">
-            <Clock className="w-4 text-orange-600"/>
-            <p className="text-orange-600">1 hour</p>
-          </div>
+        <div className=" border flex flex-col gap-4 border-gray-300 rounded-lg px-3 py-2 w-full">
+          {pendingRequests?.pendingRequests?.length > 0 && pendingRequests.pendingRequests.map((request) => {
+            const findRequest = timeEstimated?.find((item) => Number(item?.requestInfo?.requestId) === Number(request?.id));
+            console.log("🚀 ~ findRequest:", findRequest)
+
+            const requestedAt = new Date().getTime();
+            const finalizationAt = new Date(findRequest?.requestInfo?.finalizationAt);
+
+            const diffMs = Number(finalizationAt) - Number(requestedAt);
+            const diffHours = diffMs / (1000 * 60 * 60); 
+
+            const isDisabled = diffHours > 0;
+
+            return (
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 text-sm">
+                  <input
+                  type="checkbox"
+                  disabled={isDisabled}
+                  id={`checkbox-${request.id}`}
+                  className="w-4 h-4 accent-green-500"
+                  onChange={(e) => setValue(`claimRequests.${request.id}`, { id: request.id, checked: e.target.checked })}
+                  />
+                  <p>{Number(request.amountOfStETH) / 10**18} stETH</p>
+                </div>
+                <div className="flex items-center gap-2 bg-orange-200 px-2 rounded-2xl">
+                  <Clock className="w-4 text-orange-600" />
+                  <p className="text-orange-600">~{Math.round(diffHours)} hour</p>
+                </div>
+              </div>
+            )
+        })}
         </div>
         <div className="w-full">
           <button

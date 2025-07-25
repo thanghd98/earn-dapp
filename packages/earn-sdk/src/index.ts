@@ -36,10 +36,46 @@ export class EarnSDK {
             this.logger.error(`Provider ${provider} not found`);
             return;
         }
-        await earnProvider.unstake(rest);
         this.logger.success(`Staking with provider: ${provider}`);
+        return await earnProvider.unstake(rest);
     }
 
+    public async getWithdrawalRequestsIds(address: string, provider: string ) {
+        // Implementation for unstaking with Lido
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return;
+        }
+        this.logger.success(`Staking with provider: ${provider}`);
+        //@ts-expect-error
+        return await earnProvider.getWithdrawalRequestsIds(address);
+    }
+
+    public async getClaimableRequestsIds(address: string, provider: string ) {
+        // Implementation for unstaking with Lido
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return;
+        }
+        this.logger.success(`Staking with provider: ${provider}`);
+        //@ts-expect-error
+        return await earnProvider.getClaimableRequestsIds(address);
+    }
+
+    public async getClaimTimeEstimated(ids: string[], provider: string ) {
+        // Implementation for unstaking with Lido
+        const earnProvider = this.providers.get(provider);
+        if (!earnProvider) {
+            this.logger.error(`Provider ${provider} not found`);
+            return;
+        }
+        this.logger.success(`Staking with provider: ${provider}`);
+        //@ts-expect-error
+        return await earnProvider.getClaimTimeEstimated(ids);
+        
+    }
 
     public async getRewardsOnChain(adress: string, days: bigint, provider: string) : Promise<number> {
         const earnProvider = this.providers.get(provider);
@@ -61,8 +97,16 @@ export class EarnSDK {
         return await earnProvider.getAverageAPR();
     }
 
-    public claim(): void {
+    public async claim(requestIds: bigint[], provider: string): Promise<string> {
         // Implementation for claiming rewards with Lido
+         // Implementation for unstaking with Lido
+         const earnProvider = this.providers.get(provider);
+         if (!earnProvider) {
+             this.logger.error(`Provider ${provider} not found`);
+             return '';
+         }
+         this.logger.success(`Staking with provider: ${provider}`);
+         return await earnProvider.claim(requestIds);
     }
 
     public async getTotalStakedBalance(): Promise<number> {
