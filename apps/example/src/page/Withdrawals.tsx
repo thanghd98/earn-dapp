@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Controller, set, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useAccount, useBalance } from "wagmi";
 import { earnSDK } from "../services";
 import { toast } from "react-toastify";
@@ -25,12 +25,13 @@ export function Withdrawals() {
 
   const { handleSubmit, register, control, setValue, watch, reset } = useForm({
     defaultValues: {
-      requests: claimableRequests?.claimableRequests?.map((item) => {
+      requests: claimableRequests?.claimableRequests?.map((item: any) => {
         return {
           id: item?.id,
           isFinalized: item?.isFinalized,
         };
       }),
+      amount: "", // Add amount to defaultValues
     },
   });
 
@@ -47,7 +48,7 @@ export function Withdrawals() {
   useEffect(() => {
     if (claimableRequests?.claimableRequests?.length) {
       reset({
-        requests: claimableRequests?.claimableRequests.map((item) => ({
+        requests: claimableRequests?.claimableRequests.map((item: any) => ({
           id: item.id,
           isFinalized: item.isFinalized,
         })),
@@ -107,7 +108,6 @@ export function Withdrawals() {
       <form
         className="flex flex-col gap-4 justify-center items-center rounded-2xl border border-[#212121] w-1/3 mt-8 p-4"
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-expect-error
         onSubmit={handleSubmit(onWithdrawRequest)}
       >
         {isConnected && (
@@ -292,9 +292,9 @@ export function Withdrawals() {
 
         <div className=" border flex flex-col gap-4 border-[#212121] rounded-lg px-3 py-2 w-full">
           {pendingRequests?.pendingRequests?.length > 0 &&
-            pendingRequests.pendingRequests.map((request) => {
+            pendingRequests.pendingRequests.map((request: any) => {
               const findRequest = timeEstimated?.find(
-                (item) =>
+                (item: any) =>
                   Number(item?.requestInfo?.requestId) === Number(request?.id)
               );
               console.log("🚀 ~ findRequest:", findRequest);
@@ -318,6 +318,7 @@ export function Withdrawals() {
                       id={`checkbox-${request.id}`}
                       className="w-4 h-4 accent-green-500"
                       onChange={(e) =>
+                        //@ts-expect-error
                         setValue(`claimRequests.${request.id}`, {
                           id: request.id,
                           checked: e.target.checked,
@@ -337,7 +338,7 @@ export function Withdrawals() {
             })}
 
           {claimableRequests?.claimableRequests?.length > 0 &&
-            claimableRequests.claimableRequests.map((request, index) => {
+            claimableRequests.claimableRequests.map((request: any, index: number) => {
               return (
                 <div className="flex justify-between items-center text-gray-300">
                   <div className="flex items-center gap-2 text-sm">

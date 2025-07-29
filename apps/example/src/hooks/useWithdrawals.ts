@@ -23,7 +23,7 @@ export const useWithdrawals = (adress: string) => {
     const { data: timeEstimated } = useQuery({
         queryKey: ["getTimeEstimated", "LidoProvider", adress],
         queryFn: async () => {
-            const ids = pendingRequests?.pendingRequests?.map((request) => request.id) || [];
+            const ids = pendingRequests?.pendingRequests?.map((request: any) => request.id) || [];
             return await earnSDK.getClaimTimeEstimated(ids, "LidoProvider");
         },
         enabled: !!pendingRequests?.pendingRequests?.length,

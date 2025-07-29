@@ -101,8 +101,8 @@ export function Rewards() {
           {rewardsOnChain?.rewards
             ?.slice()
             ?.reverse()
-            ?.map((reward: any) => {
-              const type = {
+            ?.map((reward: { type: "submit" | "rebase" | "withdrawal"; change: string; balance: string; apr?: string; originalEvent?: { blockTimestamp?: string; args?: { reportTimestamp?: string } } }) => {
+              const type: { [key in "submit" | "rebase" | "withdrawal"]: string } = {
                 submit: "Staking",
                 rebase: "Reward",
                 withdrawal: "Withdrawal",
