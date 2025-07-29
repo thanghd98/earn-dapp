@@ -3,6 +3,12 @@ import { BaseEarnProvider } from '../../core';
 import { Logger } from '../../libs';
 import { CoinType, EIP1193Provider, IStake, IUnstake } from '../../types';
 
+declare global {
+    interface Window {
+        ethereum?: any;
+    }
+}
+
 export class LidoProvider extends BaseEarnProvider {
     public name: string = "Lido";
     private sdk: LidoSDK;
@@ -13,7 +19,6 @@ export class LidoProvider extends BaseEarnProvider {
         this.sdk = new LidoSDK({
             chainId: 560048,
             rpcUrls: ["https://rpc.hoodi.ethpandaops.io"],
-            //@ts-expect-error
             web3Provider: LidoSDKCore.createWeb3Provider(560048, window.ethereum)
         })
     }
@@ -110,7 +115,7 @@ export class LidoProvider extends BaseEarnProvider {
         };
 
         try {
-            //@ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             const requestTx = await this.sdk.withdraw.request.requestWithdrawalWithPermit({
                 amount,
                 token: token as  'stETH' | 'wstETH', // 'stETH' | 'wstETH'

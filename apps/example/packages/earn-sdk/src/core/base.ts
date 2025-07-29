@@ -1,4 +1,4 @@
-import { IStake, IUnstake } from "../types";
+import type { IStake, IUnstake } from "../types";
 
 export abstract class BaseEarnProvider{
     //@ts-expect-error unused variable

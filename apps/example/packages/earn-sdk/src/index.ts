@@ -2,7 +2,7 @@ import * as providers from './providers'
 console.log("🚀 ~ providers:", providers)
 import { BaseEarnProvider } from './core';
 import { Logger } from './libs';
-import { EIP1193Provider, InitParams } from './types/common';
+import type { EIP1193Provider, InitParams } from './types/common';
 import { IStake, IUnstake } from './types';
 
 export class EarnSDK {
