@@ -370,7 +370,7 @@ export function Withdrawals() {
           <button
             disabled={!isConnected}
             type="submit"
-            className="bg-black cursor-pointer opacity-90 w-full text-white px-4 py-2 hover:opacity-75 ease-in-out duration-200"
+            className="bg-black flex justify-center cursor-pointer opacity-90 w-full text-white px-4 py-2 hover:opacity-75 ease-in-out duration-200"
           >
              {loading ? (
               <Loading />
