@@ -1,20 +1,26 @@
-import { useAccount, useBalance } from "wagmi"
+import { useAccount, useBalance } from "wagmi";
 import { Clipboard } from "lucide-react";
 import { useReward } from "../hooks/useReward";
+import Skeleton from "react-loading-skeleton";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
 export function Rewards() {
-  const { address } = useAccount()
-  
-  const { data: sEthBalance } = useBalance({ address, token: sETH_CONTRACT_ADDRESS })
+  const { address } = useAccount();
 
-  const { rewardsOnChain, aprRewards } = useReward(address as string)
-  console.log("🚀 ~ Rewards ~ aprRewards:", aprRewards)
-  console.log("🚀 ~ Rewards ~ rewardsOnChain:", rewardsOnChain)
-  
+  const { data: sEthBalance, isLoading: isLoadingBalance } = useBalance({
+    address,
+    token: sETH_CONTRACT_ADDRESS,
+  });
+
+  const { rewardsOnChain, aprRewards, isLoadingApr, isLoadingRewardOnchain } = useReward(
+    address as string
+  );
+  console.log("🚀 ~ Rewards ~ aprRewards:", aprRewards);
+  console.log("🚀 ~ Rewards ~ rewardsOnChain:", rewardsOnChain);
+
   return (
-    <div className="p-8 flex flex-col items-center">
+    <div className=" w-full flex flex-col items-center">
       <div className="flex flex-col gap-2">
         <h1 className="text-center text-4xl font-semibold">Reward History</h1>
         <p className="text-center">
@@ -37,55 +43,105 @@ export function Rewards() {
         <div className="flex w-full justify-between items-center gap-2 border-t rounded-2xl p-4">
           <div>
             <p className="text-sm">stETH balance</p>
-            <p className="font-semibold">{(Number(sEthBalance?.value) / 10 ** 18).toFixed(8)} stETH</p>
+            {isLoadingBalance ? (
+              <Skeleton count={1} />
+            ) : (
+              <p className="font-semibold">
+                {(Number(sEthBalance?.value) / 10 ** 18).toFixed(8)} stETH
+              </p>
+            )}
           </div>
-         
+
           <div>
             <p className="text-sm">stETH rewarded</p>
-            <p className="font-semibold">{(Number(rewardsOnChain?.totalRewards) / 10 ** 18).toFixed(8)} stETH</p>
+            {isLoadingRewardOnchain ? (
+              <Skeleton count={1} />
+            ) : (
+              <p className="font-semibold">
+                {(Number(rewardsOnChain?.totalRewards) / 10 ** 18).toFixed(8)}{" "}
+                stETH
+              </p>
+            )}
           </div>
 
           <div>
             <p className="text-sm">Average APR</p>
-            <p className="font-semibold text-green-600">{Number(aprRewards).toFixed(1)}%</p>
+            {isLoadingApr ? (
+              <Skeleton count={1} />
+            ) : (
+              <p className="font-semibold text-green-600">
+                {Number(aprRewards).toFixed(1)}%
+              </p>
+            )}
           </div>
         </div>
       </div>
+      
+      <table className="table-auto border-collapse border border-gray-300 mt-8 w-full">
+        <thead>
+          <tr className="bg-black text-center">
+            <th className="border border-gray-300 px-4 py-2 text-center">
+              Date
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-center">
+              Type
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-center">
+              Change
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-center">
+              APR
+            </th>
+            <th className="border border-gray-300 px-4 py-2 text-center">
+              Balance
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rewardsOnChain?.rewards
+            ?.slice()
+            ?.reverse()
+            ?.map((reward: any) => {
+              const type = {
+                submit: "Staking",
+                rebase: "Reward",
+                withdrawal: "Withdrawal",
+              };
+              const dateNumber = Number(
+                reward?.originalEvent?.blockTimestamp ||
+                  reward?.originalEvent?.args?.reportTimestamp
+              );
+              const date = new Date(dateNumber * 1000);
+              const formatted = date.toLocaleDateString("vi-VN");
 
-        <table className="table-auto border-collapse border border-gray-300 mt-8 w-full">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2 text-left">Date</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Type</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Change</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">APR</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {              
-              rewardsOnChain?.rewards?.slice()?.reverse()?.map((reward: any) => {
-                const type = {
-                  submit: "Staking",
-                  rebase: "Reward",
-                  withdrawal: "Withdrawal"
-                }
-                const dateNumber = Number(reward?.originalEvent?.blockTimestamp || reward?.originalEvent?.args?.reportTimestamp);
-                const date = new Date(dateNumber * 1000);
-                const formatted = date.toLocaleDateString('vi-VN')
-
-                return (
-                  <tr className="hover:bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-2">{formatted}</td>
-                    <td className="border border-gray-300 px-4 py-2">{type[reward.type]}</td>
-                    <td className={`border border-gray-300 px-4 py-2 ${Number(reward.change) > 0 ? "text-green-600" : "text-red-600"}`}>{(Number(reward.change) / 10**18).toFixed(8)}</td>
-                    <td className="border border-gray-300 px-4 py-2">{reward.apr || "-"}</td>
-                    <td className="border border-gray-300 px-4 py-2">{(Number(reward.balance) / 10**18).toFixed(8)}</td>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
-      </div>
-  )
+              return (
+                <tr className="hover:bg-gray-800">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {formatted}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {type[reward.type]}
+                  </td>
+                  <td
+                    className={`border border-gray-300 px-4 py-2 ${
+                      Number(reward.change) > 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {(Number(reward.change) / 10 ** 18).toFixed(8)}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {reward.apr || "-"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {(Number(reward.balance) / 10 ** 18).toFixed(8)}
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
+    </div>
+  );
 }

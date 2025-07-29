@@ -6,31 +6,34 @@ export function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="flex justify-between items-center p-2.5 border-b border-gray-300 shadow-xl">
-      <div className="flex items-center">
-        <img src="/c98logo.png" alt="Logo" className="h-10" />
-        <span className="ml-2.5 text-lg font-bold">Coin98 staking</span>
-        <ul className="flex items-center gap-4 uppercase text-sm mx-12">
+    <div className="flex justify-between items-center py-3 px-8 fixed top-0 left-0 right-0 z-50">
+      <div>
+        {" "}
+        <img src="/c98logo.png" alt="Logo" className="h-10" />{" "}
+      </div>
+
+      <div className="absolute left-1/2 transform -translate-x-1/2 text-white text-lg">
+        <ul className="flex items-center gap-8 px-8 py-2 rounded-2xl text-sm bg-[#222524] border border-[#212121]">
           <Link
             to={"/"}
-            className={`cursor-pointer hover:underline hover:font-semibold ease-in duration-400 ${
-              isActive("/") ? "font-bold underline" : ""
+            className={`cursor-pointer ease-in duration-300 transform hover:scale-110 hover:text-yellow-400 ${
+              isActive("/") ? "text-yellow-400" : "text-white"
             }`}
           >
             Stake
           </Link>
           <Link
             to={"/withdrawals"}
-            className={`cursor-pointer hover:underline hover:font-semibold ease-in duration-400 ${
-              isActive("/withdrawals") ? "font-bold underline" : ""
+            className={`cursor-pointer ease-in duration-300 transform hover:scale-110 hover:text-yellow-400 ${
+              isActive("/withdrawals") ? "text-yellow-400" : "text-white"
             }`}
           >
             Withdrawals
           </Link>
           <Link
             to={"/rewards"}
-            className={`cursor-pointer hover:underline hover:font-semibold ease-in duration-400 ${
-              isActive("/rewards") ? "font-bold underline" : ""
+            className={`cursor-pointer ease-in duration-300 transform hover:scale-110 hover:text-yellow-400 ${
+              isActive("/rewards") ? "text-yellow-400" : "text-white"
             }`}
           >
             Rewards
@@ -38,7 +41,10 @@ export function Header() {
         </ul>
       </div>
 
-      <ConnectButton />
+      <div>
+        {" "}
+        <ConnectButton />{" "}
+      </div>
     </div>
   );
 }

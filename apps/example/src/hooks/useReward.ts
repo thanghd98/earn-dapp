@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { earnSDK } from "../services";
 
 export const useReward = (adress: string) => {
-    const { data: apr } = useQuery({
+    const { data: apr, isLoading: isLoadingApr } = useQuery({
         queryKey: ["averageAPR", "LidoProvider", adress],
         queryFn: async () => {
             return await earnSDK.getAverageAPR("LidoProvider");
@@ -11,7 +11,7 @@ export const useReward = (adress: string) => {
         refetchInterval: 100 * 60 * 60, // 1 hour
     });
 
-    const { data: rewardsOnChain } = useQuery({
+    const { data: rewardsOnChain, isLoading: isLoadingRewardOnchain } = useQuery({
         queryKey: ["rewardsOnChain", "LidoProvider", adress],
         queryFn: async () => {
             return await earnSDK.getRewardsOnChain(adress as string, 7n, "LidoProvider") as any;
@@ -30,6 +30,8 @@ export const useReward = (adress: string) => {
     return {
         rewardsOnChain,
         aprRewards: aprRewards / rebaseApr?.length || 0 , // Average APR across all rewards
-        apr
+        apr,
+        isLoadingApr,
+        isLoadingRewardOnchain
     }
 }

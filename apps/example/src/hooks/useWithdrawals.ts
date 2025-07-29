@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { earnSDK } from "../services";
 
 export const useWithdrawals = (adress: string) => {
-    const { data: pendingRequests } = useQuery({
+    const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({
         queryKey: ["getPendingRequest", "LidoProvider", adress],
         queryFn: async () => {
             return await earnSDK.getWithdrawalRequestsIds(adress, "LidoProvider");
@@ -33,6 +33,7 @@ export const useWithdrawals = (adress: string) => {
     return {
         pendingRequests,
         claimableRequests,
-        timeEstimated
+        timeEstimated,
+        isLoadingPending
     }
 }

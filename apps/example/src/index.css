@@ -1,9 +1,37 @@
 @import "tailwindcss";
 
 :root {
+  background-color: black;
+  color: white;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+@keyframes slowGlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -10px) scale(1.05);
+  }
+}
+
+@keyframes reverseGlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-15px, 10px) scale(1.03);
+  }
+}
+
+.glow-animation {
+  animation: slowGlow 10s ease-in-out infinite;
+}
+
+.glow-animation-reverse {
+  animation: reverseGlow 12s ease-in-out infinite;
 }

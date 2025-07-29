@@ -10,6 +10,9 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { ToastContainer } from 'react-toastify';
 import { Header } from './components/Header.tsx'
 import { BrowserRouter } from 'react-router-dom'
+import { Footer } from './components/Footer.tsx'
+import { SkeletonTheme } from 'react-loading-skeleton';
+import "react-loading-skeleton/dist/skeleton.css"
 
 const config = getDefaultConfig({
     appName: "Victoria xao quyet",
@@ -25,9 +28,12 @@ createRoot(document.getElementById('root')!).render(
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
-            <Header />
-            <App />
-            <ToastContainer />
+            <SkeletonTheme baseColor="#202020" highlightColor="#444">
+              <Header />
+              <App />
+              <Footer />
+              <ToastContainer />
+            </SkeletonTheme>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

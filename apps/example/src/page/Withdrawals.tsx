@@ -1,27 +1,62 @@
 import { Clock } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, set, useFieldArray, useForm } from "react-hook-form";
 import { useAccount, useBalance } from "wagmi";
 import { earnSDK } from "../services";
 import { toast } from "react-toastify";
 import { useWithdrawals } from "../hooks/useWithdrawals";
+import Skeleton from "react-loading-skeleton";
+import { Loading } from "../components/Loading";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
 export function Withdrawals() {
+  const [loading, setLoading] = useState(false);
   const { address, isConnected } = useAccount();
-  const { handleSubmit, register, setValue } = useForm();
 
   const [tab, setTab] = useState("request");
 
-  const { pendingRequests, claimableRequests, timeEstimated } = useWithdrawals(address as string);
+  const {
+    pendingRequests,
+    claimableRequests,
+    timeEstimated,
+    isLoadingPending,
+  } = useWithdrawals(address as string);
 
-  const { data: sEthBalance } = useBalance({
+  const { handleSubmit, register, control, setValue, watch, reset } = useForm({
+    defaultValues: {
+      requests: claimableRequests?.claimableRequests?.map((item) => {
+        return {
+          id: item?.id,
+          isFinalized: item?.isFinalized,
+        };
+      }),
+    },
+  });
+
+  const { data: sEthBalance, isLoading: isLoadingNative } = useBalance({
     address,
     token: sETH_CONTRACT_ADDRESS,
   });
 
+  const watched = watch();
+  useEffect(() => {
+    console.log("watched values", watched);
+  }, [watched]);
+
+  useEffect(() => {
+    if (claimableRequests?.claimableRequests?.length) {
+      reset({
+        requests: claimableRequests?.claimableRequests.map((item) => ({
+          id: item.id,
+          isFinalized: item.isFinalized,
+        })),
+      });
+    }
+  }, [claimableRequests, reset]);
+
   const onWithdrawRequest = async (data: { amount: string }) => {
+    setLoading(true);
     const hash = await earnSDK.unstake({
       provider: "LidoProvider",
       amount: data.amount,
@@ -40,13 +75,17 @@ export function Withdrawals() {
         position: "bottom-right",
       }
     );
+    setLoading(false);
   };
 
   const onClaim = async (data: any) => {
-    const claimRequestFilter = await data.claimRequests.filter((request: any) => request.checked) || [];
+    setLoading(true);
+
+    const claimRequestFilter =
+      (await data.requests.filter((request: any) => request.isFinalized)) || [];
     const ids = claimRequestFilter.map((request: any) => request.id);
-  
-    const hash = await earnSDK.claim( ids, "LidoProvider" );
+
+    const hash = await earnSDK.claim(ids, "LidoProvider");
 
     toast.success(
       <div>
@@ -60,12 +99,13 @@ export function Withdrawals() {
         position: "bottom-right",
       }
     );
-  }
+    setLoading(false);
+  };
 
   const requestWithdrawal = () => {
     return (
       <form
-        className="flex flex-col gap-4 justify-center items-center rounded-2xl border bor w-1/3 mt-8 p-4"
+        className="flex flex-col gap-4 justify-center items-center rounded-2xl border border-[#212121] w-1/3 mt-8 p-4"
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-expect-error
         onSubmit={handleSubmit(onWithdrawRequest)}
@@ -76,33 +116,51 @@ export function Withdrawals() {
               <div className="text-left">
                 <p className="text-sm">stETH balance</p>
                 <p className="text-xl font-semibold">
-                  {(Number(sEthBalance?.value) / 10 ** 18).toFixed(4)} stETH
+                  {isLoadingNative ? (
+                    <Skeleton count={1} />
+                  ) : (
+                    (Number(sEthBalance?.value) / 10 ** 18).toFixed(4) +
+                    " " +
+                    "stETH"
+                  )}{" "}
                 </p>
               </div>
+
               <div>
                 <div className="flex items-center flex-col gap-2">
                   <p className="text-sm text-left">My requests</p>
+
                   <div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="orangeCheckbox"
-                          checked
-                          className="w-4 h-4 accent-orange-500"
-                        />
-                        <label className="text-sm font-semibold">{pendingRequests?.pendingRequests?.length || 0}</label>
+                    {isLoadingPending ? (
+                      <div className="flex items-center gap-2 h-full">
+                        <Skeleton count={1} />
                       </div>
+                    ) : (
                       <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="orangeCheckbox"
-                          checked
-                          className="w-4 h-4 accent-green-500"
-                        />
-                        <p className="text-sm font-semibold">{claimableRequests?.claimableRequests?.length || 0}</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="orangeCheckbox"
+                            checked
+                            className="w-4 h-4 accent-gray-300"
+                          />
+                          <label className="text-sm font-semibold">
+                            {pendingRequests?.pendingRequests?.length || 0}
+                          </label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="orangeCheckbox"
+                            checked
+                            className="w-4 h-4 accent-gray-800"
+                          />
+                          <p className="text-sm font-semibold">
+                            {claimableRequests?.claimableRequests?.length || 0}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -110,7 +168,7 @@ export function Withdrawals() {
           </div>
         )}
 
-        <div className="flex justify-between items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 w-full">
+        <div className="flex justify-between items-center gap-2 border border-[#212121] rounded-lg px-3 py-2 w-full">
           <div className="flex items-center ">
             <img
               src="https://assets.coingecko.com/coins/images/279/standard/ethereum.png?1696501628"
@@ -119,7 +177,7 @@ export function Withdrawals() {
               alt=""
             />
             <input
-              placeholder="sERTH amount"
+              placeholder="sETH amount"
               type="text"
               className="outline-none border-none px-4 py-1"
               {...register("amount", { required: true })}
@@ -136,9 +194,15 @@ export function Withdrawals() {
           <button
             disabled={!isConnected}
             type="submit"
-            className="bg-black cursor-pointer opacity-90 w-full text-white px-4 py-2 hover:opacity-75 ease-in-out duration-200"
+            className="bg-black flex justify-center cursor-pointer opacity-90 w-full text-white px-4 py-2 hover:opacity-75 ease-in-out duration-200"
           >
-            {isConnected ? "Request withdrawal" : "Connect Wallet"}
+            {loading ? (
+              <Loading />
+            ) : isConnected ? (
+              "Request withdrawal"
+            ) : (
+              "Connect Wallet"
+            )}
           </button>
         </div>
         <div className="w-full flex flex-col gap-2 text-sm">
@@ -166,7 +230,7 @@ export function Withdrawals() {
   const claimWithdrawal = () => {
     return (
       <form
-        className="flex flex-col gap-4 justify-center items-center rounded-2xl border bor w-1/3 mt-8 p-4"
+        className="flex flex-col gap-4 justify-center items-center rounded-2xl border border-[#212121] w-1/3 mt-8 p-4"
         onSubmit={handleSubmit(onClaim)}
       >
         {isConnected && (
@@ -177,7 +241,7 @@ export function Withdrawals() {
                 <p className="text-xl font-semibold">0.0 ETH</p>
               </div>
             </div>
-            <hr className="border-gray-300 w-full my-2" />
+            <hr className="border-[#212121] w-full my-2" />
 
             <div className="w-full flex justify-between items-center mb-2">
               <div>
@@ -190,18 +254,22 @@ export function Withdrawals() {
                           type="checkbox"
                           id="orangeCheckbox"
                           checked
-                          className="w-4 h-4 accent-orange-500"
+                          className="w-4 h-4 accent-gray-300"
                         />
-                        <label className="text-sm font-semibold">{pendingRequests?.pendingRequests?.length || 0}</label>
+                        <label className="text-sm font-semibold">
+                          {pendingRequests?.pendingRequests?.length || 0}
+                        </label>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
                           id="orangeCheckbox"
                           checked
-                          className="w-4 h-4 accent-green-500"
+                          className="w-4 h-4 accent-gray-800"
                         />
-                        <p className="text-sm font-semibold">{claimableRequests?.claimableRequests?.length || 0}</p>
+                        <p className="text-sm font-semibold">
+                          {claimableRequests?.claimableRequests?.length || 0}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -209,44 +277,94 @@ export function Withdrawals() {
               </div>
               <div>
                 <p className="text-sm text-left">My pending amount</p>
-                <p className="text-xl font-semibold">{Number(pendingRequests?.pendingAmountStETH) / 10**18} stETH</p>
+                <p className="text-xl font-semibold">
+                  {isLoadingPending ? (
+                    <Skeleton count={1} />
+                  ) : (
+                    `${Number(pendingRequests?.pendingAmountStETH) /
+                      10 ** 18} stETH`
+                  )}
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        <div className=" border flex flex-col gap-4 border-gray-300 rounded-lg px-3 py-2 w-full">
-          {pendingRequests?.pendingRequests?.length > 0 && pendingRequests.pendingRequests.map((request) => {
-            const findRequest = timeEstimated?.find((item) => Number(item?.requestInfo?.requestId) === Number(request?.id));
-            console.log("🚀 ~ findRequest:", findRequest)
+        <div className=" border flex flex-col gap-4 border-[#212121] rounded-lg px-3 py-2 w-full">
+          {pendingRequests?.pendingRequests?.length > 0 &&
+            pendingRequests.pendingRequests.map((request) => {
+              const findRequest = timeEstimated?.find(
+                (item) =>
+                  Number(item?.requestInfo?.requestId) === Number(request?.id)
+              );
+              console.log("🚀 ~ findRequest:", findRequest);
 
-            const requestedAt = new Date().getTime();
-            const finalizationAt = new Date(findRequest?.requestInfo?.finalizationAt);
+              const requestedAt = new Date().getTime();
+              const finalizationAt = new Date(
+                findRequest?.requestInfo?.finalizationAt
+              );
 
-            const diffMs = Number(finalizationAt) - Number(requestedAt);
-            const diffHours = diffMs / (1000 * 60 * 60); 
+              const diffMs = Number(finalizationAt) - Number(requestedAt);
+              const diffHours = diffMs / (1000 * 60 * 60);
 
-            const isDisabled = diffHours > 0;
+              const isDisabled = diffHours > 0;
 
-            return (
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 text-sm">
-                  <input
-                  type="checkbox"
-                  disabled={isDisabled}
-                  id={`checkbox-${request.id}`}
-                  className="w-4 h-4 accent-green-500"
-                  onChange={(e) => setValue(`claimRequests.${request.id}`, { id: request.id, checked: e.target.checked })}
-                  />
-                  <p>{Number(request.amountOfStETH) / 10**18} stETH</p>
+              return (
+                <div className="flex justify-between items-center text-gray-300">
+                  <div className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      disabled={isDisabled}
+                      id={`checkbox-${request.id}`}
+                      className="w-4 h-4 accent-green-500"
+                      onChange={(e) =>
+                        setValue(`claimRequests.${request.id}`, {
+                          id: request.id,
+                          checked: e.target.checked,
+                        })
+                      }
+                    />
+                    <p>{Number(request.amountOfStETH) / 10 ** 18} stETH</p>
+                  </div>
+                  <div className="flex items-center gap-2 bg-orange-200 px-2 rounded-2xl">
+                    <Clock className="w-4 text-orange-600" />
+                    <p className="text-orange-600">
+                      ~{Math.round(diffHours)} hour
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-orange-200 px-2 rounded-2xl">
-                  <Clock className="w-4 text-orange-600" />
-                  <p className="text-orange-600">~{Math.round(diffHours)} hour</p>
+              );
+            })}
+
+          {claimableRequests?.claimableRequests?.length > 0 &&
+            claimableRequests.claimableRequests.map((request, index) => {
+              return (
+                <div className="flex justify-between items-center text-gray-300">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Controller
+                      key={request.id.toString()}
+                      control={control}
+                      name={`requests.${index}.isFinalized`}
+                      render={({ field }) => (
+                        <input
+                          className="w-4 h-4 accent-green-500"
+                          type="checkbox"
+                          {...field}
+                          checked={field.value ?? false} // chống undefined ở lần đầu
+                        />
+                      )}
+                    />
+
+                    <p>{Number(request.amountOfStETH) / 10 ** 18} stETH</p>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-blue-200 px-2 rounded-2xl">
+                    <Clock className="w-4 text-blue-600" />
+                    <p className="text-blue-600">Ready</p>
+                  </div>
                 </div>
-              </div>
-            )
-        })}
+              );
+            })}
         </div>
         <div className="w-full">
           <button
@@ -254,7 +372,13 @@ export function Withdrawals() {
             type="submit"
             className="bg-black cursor-pointer opacity-90 w-full text-white px-4 py-2 hover:opacity-75 ease-in-out duration-200"
           >
-            {isConnected ? "Claim" : "Connect Wallet"}
+             {loading ? (
+              <Loading />
+            ) : isConnected ? (
+              "Claim"
+            ) : (
+              "Connect Wallet"
+            )}
           </button>
         </div>
         <div className="w-full flex flex-col gap-2 text-sm">
@@ -268,7 +392,7 @@ export function Withdrawals() {
   };
 
   return (
-    <div className="p-8 flex flex-col items-center">
+    <div className="w-full flex flex-col items-center">
       <div className="flex flex-col gap-2">
         <h1 className="text-center text-4xl font-semibold">Withdrawals</h1>
         <p className="text-center">
