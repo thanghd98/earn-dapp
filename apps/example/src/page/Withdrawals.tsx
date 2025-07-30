@@ -107,7 +107,7 @@ export function Withdrawals() {
     return (
       <form
         className="flex flex-col gap-4 justify-center items-center rounded-2xl border border-[#212121] w-1/3 mt-8 p-4"
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+         
         onSubmit={handleSubmit(onWithdrawRequest)}
       >
         {isConnected && (
@@ -297,9 +297,11 @@ export function Withdrawals() {
                 (item: any) =>
                   Number(item?.requestInfo?.requestId) === Number(request?.id)
               );
-              console.log("🚀 ~ findRequest:", findRequest);
 
-              const requestedAt = new Date().getTime();
+              const requestedAt = new Date(
+                findRequest?.requestInfo?.requestedAt
+              );;
+              
               const finalizationAt = new Date(
                 findRequest?.requestInfo?.finalizationAt
               );

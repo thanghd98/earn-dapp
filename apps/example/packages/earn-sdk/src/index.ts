@@ -21,8 +21,10 @@ export class EarnSDK {
 
     public async stake(params: IStake & { provider: string }) {
         const { provider, ...rest } = params
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
         console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
@@ -35,6 +37,10 @@ export class EarnSDK {
     public async unstake(params: IUnstake & { provider: string }) {
         // Implementation for unstaking with Lido
         const { provider, ...rest } = params
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        this.logger.info(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
@@ -46,6 +52,10 @@ export class EarnSDK {
 
     public async getWithdrawalRequestsIds(address: string, provider: string ) {
         // Implementation for unstaking with Lido
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        this.logger.info(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
@@ -58,6 +68,10 @@ export class EarnSDK {
 
     public async getClaimableRequestsIds(address: string, provider: string ) {
         // Implementation for unstaking with Lido
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        this.logger.info(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
@@ -70,6 +84,10 @@ export class EarnSDK {
 
     public async getClaimTimeEstimated(ids: string[], provider: string ) {
         // Implementation for unstaking with Lido
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        this.logger.info(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
@@ -82,10 +100,14 @@ export class EarnSDK {
     }
 
     public async getRewardsOnChain(adress: string, days: bigint, provider: string) : Promise<number> {
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        this.logger.info(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
-            return 0;
+            return;
         }
         //@ts-expect-error
         return await earnProvider.getRewardsOnChain(adress, days);
