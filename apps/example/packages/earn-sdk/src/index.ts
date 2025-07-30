@@ -107,7 +107,6 @@ export class EarnSDK {
         const earnProvider = this.providers.get(provider);
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
-            return;
         }
         //@ts-expect-error
         return await earnProvider.getRewardsOnChain(adress, days);
