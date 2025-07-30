@@ -8,20 +8,9 @@ import { IStake, IUnstake } from './types';
 export class EarnSDK {
     private logger = new Logger('EarnSDK')
     // Stake Provider
-    private providers = new Map<string, BaseEarnProvider>();
+    private providers: Record<string, BaseEarnProvider>;
     // Web3 provider
     private web3Provider: EIP1193Provider | undefined;
-
-    public static providerNames = {
-        EarnSDK: 'EarnSDK', // Renamed from 'name' to 'providerNames'
-        LidoProvider: 'LidoProvider',
-        RocketPoolProvider: 'RocketPoolProvider',
-        StakeWiseProvider: 'StakeWiseProvider',
-        FraxFinanceProvider: 'FraxFinanceProvider',
-        CoinbaseStakingProvider: 'CoinbaseStakingProvider',
-        KrakenStakingProvider: 'KrakenStakingProvider',
-        BinanceStakingProvider: 'BinanceStakingProvider'
-    }
 
     constructor(initParams: InitParams) {
         this.logger = new Logger('EarnSDK', !!initParams?.debug);
@@ -32,11 +21,9 @@ export class EarnSDK {
 
     public async stake(params: IStake & { provider: string }) {
         const { provider, ...rest } = params
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
@@ -48,11 +35,9 @@ export class EarnSDK {
     public async unstake(params: IUnstake & { provider: string }) {
         // Implementation for unstaking with Lido
         const { provider, ...rest } = params
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
@@ -63,11 +48,9 @@ export class EarnSDK {
 
     public async getWithdrawalRequestsIds(address: string, provider: string ) {
         // Implementation for unstaking with Lido
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
@@ -79,11 +62,9 @@ export class EarnSDK {
 
     public async getClaimableRequestsIds(address: string, provider: string ) {
         // Implementation for unstaking with Lido
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
@@ -95,11 +76,9 @@ export class EarnSDK {
 
     public async getClaimTimeEstimated(ids: string[], provider: string ) {
         // Implementation for unstaking with Lido
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return;
@@ -111,11 +90,9 @@ export class EarnSDK {
     }
 
     public async getRewardsOnChain(adress: string, days: bigint, provider: string) : Promise<number> {
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         this.logger.info(provider);
-        console.log("🚀 ~ EarnSDK ~ stake ~ provider:", provider)
         console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
-        const earnProvider = this.providers.get(provider);
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
         }
@@ -124,7 +101,9 @@ export class EarnSDK {
     }
 
     public async getAverageAPR(provider: string) : Promise<number> {
-        const earnProvider = this.providers.get(provider);
+        console.log("🚀 ~ EarnSDK ~ getAverageAPR ~ provider:", provider)
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
+        const earnProvider = this.providers[provider];
         if (!earnProvider) {
             this.logger.error(`Provider ${provider} not found`);
             return 0;
@@ -136,7 +115,8 @@ export class EarnSDK {
     public async claim(requestIds: bigint[], provider: string): Promise<string> {
         // Implementation for claiming rewards with Lido
          // Implementation for unstaking with Lido
-         const earnProvider = this.providers.get(provider);
+        console.log("🚀 ~ EarnSDK ~ stake ~ this.providers:", this.providers)
+         const earnProvider = this.providers[provider];
          if (!earnProvider) {
              this.logger.error(`Provider ${provider} not found`);
              return '';
@@ -170,12 +150,14 @@ export class EarnSDK {
 
     private initBuiltInProvider() {
         // Initialize built-in providers
-        Object.values(providers).map(provider => {
-            console.log("🚀 ~ EarnSDK ~ initBuiltInProvider ~ providers:", provider.name)
-            const createdProvider = new provider(this.logger, this.web3Provider)
-            this.providers.set(provider.name, createdProvider as unknown as BaseEarnProvider)
-        })
+        
+        this.providers = Object.values(providers).reduce((acc, Provider) => {
+            const instance = new Provider(this.logger, this.web3Provider);
+            acc[Provider.name] = instance as unknown as BaseEarnProvider;
+            return acc;
+        }, {} as Record<string, BaseEarnProvider>);
+        console.log("🚀 ~ EarnSDK ~ initBuiltInProvider ~  this.providers:",  this.providers)
 
-        this.logger.info(`Initialized built-in providers: ${Array.from(this.providers.keys()).join(', ')}`);
+        this.logger.info(`Initialized built-in providers: ${Object.keys(this.providers).join(', ')}`);
     }
 }

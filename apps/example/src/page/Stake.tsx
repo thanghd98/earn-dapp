@@ -7,7 +7,6 @@ import { BadgeQuestionMark } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { Loading } from "../components/Loading";
 import { useState } from "react";
-import { EarnSDK } from "../../packages/earn-sdk/src";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
@@ -29,7 +28,7 @@ export function Stake() {
         setLoading(true);
       const result = await earnSDK.stake({
         amount: data.amount,
-        provider: EarnSDK.providerNames.LidoProvider
+        provider: 'LidoProvider'
       })
   
       toast.success(

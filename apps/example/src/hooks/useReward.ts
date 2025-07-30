@@ -6,7 +6,7 @@ export const useReward = (adress: string) => {
     const { data: apr, isLoading: isLoadingApr } = useQuery({
         queryKey: ["averageAPR", "LidoProvider", adress],
         queryFn: async () => {
-            return await earnSDK.getAverageAPR(EarnSDK.providerNames.LidoProvider);
+            return await earnSDK.getAverageAPR('LidoProvider');
         },
         enabled: !!adress,
         refetchInterval: 100 * 60 * 60, // 1 hour
@@ -15,7 +15,7 @@ export const useReward = (adress: string) => {
     const { data: rewardsOnChain, isLoading: isLoadingRewardOnchain } = useQuery({
         queryKey: ["rewardsOnChain", "LidoProvider", adress],
         queryFn: async () => {
-            return await earnSDK.getRewardsOnChain(adress as string, 7n, EarnSDK.providerNames.LidoProvider) as any;
+            return await earnSDK.getRewardsOnChain(adress as string, 7n, 'LidoProvider') as any;
         },
         enabled: !!adress,
         refetchInterval: 100 * 60 * 60, // 1 hour

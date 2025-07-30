@@ -60,7 +60,7 @@ export function Withdrawals() {
   const onWithdrawRequest = async (data: { amount: string }) => {
     setLoading(true);
     const hash = await earnSDK.unstake({
-      provider: EarnSDK.providerNames.LidoProvider,
+      provider: 'LidoProvider',
       amount: data.amount,
       token: "stETH", // or "wstETH"
     });
@@ -87,7 +87,7 @@ export function Withdrawals() {
       (await data.requests.filter((request: any) => request.isFinalized)) || [];
     const ids = claimRequestFilter.map((request: any) => request.id);
 
-    const hash = await earnSDK.claim(ids,EarnSDK.providerNames.LidoProvider);
+    const hash = await earnSDK.claim(ids,'LidoProvider');
 
     toast.success(
       <div>
