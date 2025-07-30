@@ -10,7 +10,7 @@ declare global {
 }
 
 export class LidoProvider extends BaseEarnProvider {
-    public name: string = "Lido";
+    public name: string = "LidoProvider";
     private sdk: LidoSDK;
 
     //@ts-expect-error

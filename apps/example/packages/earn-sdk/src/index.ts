@@ -160,6 +160,7 @@ export class EarnSDK {
     private initBuiltInProvider() {
         // Initialize built-in providers
         Object.values(providers).map(provider => {
+            console.log("🚀 ~ EarnSDK ~ initBuiltInProvider ~ providers:", provider.name)
             const createdProvider = new provider(this.logger, this.web3Provider)
             this.providers.set(provider.name, createdProvider as unknown as BaseEarnProvider)
         })
