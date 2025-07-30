@@ -12,6 +12,17 @@ export class EarnSDK {
     // Web3 provider
     private web3Provider: EIP1193Provider | undefined;
 
+    public static providerNames = {
+        EarnSDK: 'EarnSDK', // Renamed from 'name' to 'providerNames'
+        LidoProvider: 'LidoProvider',
+        RocketPoolProvider: 'RocketPoolProvider',
+        StakeWiseProvider: 'StakeWiseProvider',
+        FraxFinanceProvider: 'FraxFinanceProvider',
+        CoinbaseStakingProvider: 'CoinbaseStakingProvider',
+        KrakenStakingProvider: 'KrakenStakingProvider',
+        BinanceStakingProvider: 'BinanceStakingProvider'
+    }
+
     constructor(initParams: InitParams) {
         this.logger = new Logger('EarnSDK', !!initParams?.debug);
         this.logger.info('Initializing EarnSDK with parameters:');

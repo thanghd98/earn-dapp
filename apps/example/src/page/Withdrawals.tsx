@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useWithdrawals } from "../hooks/useWithdrawals";
 import Skeleton from "react-loading-skeleton";
 import { Loading } from "../components/Loading";
+import { EarnSDK } from "../../packages/earn-sdk/src";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
@@ -59,7 +60,7 @@ export function Withdrawals() {
   const onWithdrawRequest = async (data: { amount: string }) => {
     setLoading(true);
     const hash = await earnSDK.unstake({
-      provider: "LidoProvider",
+      provider: EarnSDK.providerNames.LidoProvider,
       amount: data.amount,
       token: "stETH", // or "wstETH"
     });
@@ -86,7 +87,7 @@ export function Withdrawals() {
       (await data.requests.filter((request: any) => request.isFinalized)) || [];
     const ids = claimRequestFilter.map((request: any) => request.id);
 
-    const hash = await earnSDK.claim(ids, "LidoProvider");
+    const hash = await earnSDK.claim(ids,EarnSDK.providerNames.LidoProvider);
 
     toast.success(
       <div>
