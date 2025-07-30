@@ -136,7 +136,7 @@ export class EarnSDK {
         // Initialize built-in providers
         Object.values(providers).map(provider => {
             const createdProvider = new provider(this.logger, this.web3Provider)
-            this.providers.set(provider.name, createdProvider as unknown as BaseEarnProvider)
+            this.providers.set("LidoProvider", createdProvider as unknown as BaseEarnProvider)
         })
 
         this.logger.info(`Initialized built-in providers: ${Array.from(this.providers.keys()).join(', ')}`);
