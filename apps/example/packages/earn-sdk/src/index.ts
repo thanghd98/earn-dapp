@@ -153,7 +153,7 @@ export class EarnSDK {
         
         this.providers = Object.values(providers).reduce((acc, Provider) => {
             const instance = new Provider(this.logger, this.web3Provider);
-            acc[Provider.name] = instance as unknown as BaseEarnProvider;
+            acc["LidoProvider"] = instance as unknown as BaseEarnProvider;
             return acc;
         }, {} as Record<string, BaseEarnProvider>);
         console.log("🚀 ~ EarnSDK ~ initBuiltInProvider ~  this.providers:",  this.providers)
