@@ -8,7 +8,7 @@ import { IStake, IUnstake } from './types';
 export class EarnSDK {
     private logger = new Logger('EarnSDK')
     // Stake Provider
-    private providers: Record<string, BaseEarnProvider>;
+    private providers: Record<string, BaseEarnProvider>= {};
     // Web3 provider
     private web3Provider: EIP1193Provider | undefined;
 

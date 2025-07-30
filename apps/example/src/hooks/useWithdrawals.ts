@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { earnSDK } from "../services";
-import { EarnSDK } from "../../packages/earn-sdk/src";
 
 export const useWithdrawals = (adress: string) => {
     const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { earnSDK } from "../services";
-import { EarnSDK } from "../../packages/earn-sdk/src";
 
 export const useReward = (adress: string) => {
     const { data: apr, isLoading: isLoadingApr } = useQuery({

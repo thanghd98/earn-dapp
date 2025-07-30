@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { useWithdrawals } from "../hooks/useWithdrawals";
 import Skeleton from "react-loading-skeleton";
 import { Loading } from "../components/Loading";
-import { EarnSDK } from "../../packages/earn-sdk/src";
 
 const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
