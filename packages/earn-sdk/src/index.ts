@@ -165,10 +165,11 @@ export class EarnSDK {
     }
 
     private initBuiltInProvider() {
+        const names = ['LidoProvider', 'ChorusOneProvider']
         // Initialize built-in providers
-        Object.values(providers).map(provider => {
+        Object.values(providers).map((provider, index) => {
             const createdProvider = new provider(this.logger, this.web3Provider)
-            this.providers.set(provider.name, createdProvider as unknown as BaseEarnProvider)
+            this.providers.set(names[index], createdProvider as unknown as BaseEarnProvider)
         })
 
         this.logger.info(`Initialized built-in providers: ${Array.from(this.providers.keys()).join(', ')}`);
