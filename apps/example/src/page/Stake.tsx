@@ -11,8 +11,7 @@ import { useStake } from "../hooks/useStake";
 export function Stake() {
   const [loading, setLoading] = useState(false);
   const { provider } = useProvider();
-  const { register, handleSubmit, watch } = useForm();
-  const amount = watch("amount");
+  const { register, handleSubmit } = useForm();
 
   const { stakeProvider } = useStakeProvider();
 
@@ -23,7 +22,7 @@ export function Stake() {
     address,
   });
 
-  const { totalStakedBalance, isLoadingTotalStaked, tokens } = useStake(
+  const { totalStakedBalance, isLoadingTotalStaked } = useStake(
     address as string,
     provider,
     stakeProvider
@@ -48,7 +47,7 @@ export function Stake() {
       toast.success(
         <div>
           <p className="font-sm">Transaction successfully</p>
-          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash : result}</p>
+          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash as string : result}</p>
         </div>,
         {
           onClick: () => {

@@ -2,7 +2,7 @@ import { Stake } from "./page/Stake";
 import { Routes, Route } from "react-router-dom";
 import { Withdrawals } from "./page/Withdrawals";
 import { Rewards } from "./page/Rewards";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProviderContext, StakeProviderContext } from "./hooks/useProvider";
 import { useStake } from "./hooks/useStake";
 import { useAccount } from "wagmi";

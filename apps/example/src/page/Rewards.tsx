@@ -1,11 +1,9 @@
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 import { Clipboard } from "lucide-react";
 import { useReward } from "../hooks/useReward";
 import Skeleton from "react-loading-skeleton";
 import { useProvider, useStakeProvider } from "../hooks/useProvider";
 import { Loading } from "../components/Loading";
-
-const sETH_CONTRACT_ADDRESS = "0x3508a952176b3c15387c97be809eaffb1982176a"; // stETH contract address
 
 export function Rewards() {
   const { address } = useAccount();
@@ -97,6 +95,7 @@ export function Rewards() {
                 rebase: "Reward",
                 withdrawal: "Withdrawal",
               };
+              //@ts-expect-error
               const date = new Date(reward.timestamp * 1000);
               const formatted = date.toLocaleDateString("vi-VN");
 
@@ -110,12 +109,15 @@ export function Rewards() {
                   </td>
                   <td
                     className={`border border-gray-300 px-4 py-2 ${
+                      //@ts-expect-error
                       Number(reward.amount) > 0
                         ? "text-green-600"
                         : "text-red-600"
                     }`}
                   >
-                    +{(Number(reward.amount) / 10 ** 18).toFixed(8)}
+                    +{
+                      //@ts-expect-error
+                    (Number(reward?.amount) / 10 ** 18).toFixed(8)}
                   </td>
                   
                 </tr>

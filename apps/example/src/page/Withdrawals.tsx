@@ -78,11 +78,11 @@ export function Withdrawals() {
       toast.success(
         <div>
           <p className="font-sm">Transaction successfully</p>
-          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash : result}</p>
+          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash as string : result}</p>
         </div>,
         {
           onClick: () => {
-            window.open(`https://hoodi.etherscan.io/tx/${typeof result === 'object' ? hash : result}`, "_blank");
+            window.open(`https://hoodi.etherscan.io/tx/${typeof result === 'object' ? hash as string : result}`, "_blank");
           },
           position: "bottom-right",
         }
@@ -114,11 +114,11 @@ export function Withdrawals() {
       toast.success(
         <div>
           <p className="font-sm">Transaction successfully</p>
-          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash : result}</p>
+          <p className="text-xs truncate max-w-[250px]">{typeof result === 'object' ? hash as string : result}</p>
         </div>,
         {
           onClick: () => {
-            window.open(`https://hoodi.etherscan.io/tx/${typeof result === 'object' ? hash : result}`, "_blank");
+            window.open(`https://hoodi.etherscan.io/tx/${typeof result === 'object' ? hash as string : result}`, "_blank");
           },
           position: "bottom-right",
         }
@@ -258,7 +258,9 @@ export function Withdrawals() {
             <div className="w-full flex justify-between items-center">
               <div className="text-left">
                 <p className="text-sm">Available to claim</p>
-                <p className="text-xl font-semibold">{Number(claimableRequests?.claimAmount) / 10**tokens?.decimals} ETH</p>
+                <p className="text-xl font-semibold">{Number(claimableRequests?.claimAmount) / 
+                //@ts-expect-error
+                10**tokens?.decimals} ETH</p>
               </div>
             </div>
             <hr className="border-[#212121] w-full my-2" />
@@ -311,7 +313,7 @@ export function Withdrawals() {
         )}
 
         <div className=" border flex flex-col gap-4 border-[#212121] rounded-lg px-3 py-2 w-full">
-          {pendingRequests?.pendingRequests?.length > 0 &&
+          {pendingRequests && pendingRequests?.pendingRequests?.length > 0 &&
             pendingRequests.pendingRequests.map((request: any) => {
               const isDisabled = request.timestamp > 0;
 
@@ -343,7 +345,7 @@ export function Withdrawals() {
               );
             })}
 
-          {claimableRequests?.claimRequests?.length > 0 &&
+          { claimableRequests && claimableRequests?.claimRequests?.length > 0 &&
             claimableRequests.claimRequests.map(
               (request: any, index: number) => {
                 return (

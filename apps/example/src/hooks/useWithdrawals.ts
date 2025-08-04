@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { earnSDK } from "../services";
 
+//@ts-expect-error
 export const useWithdrawals = (adress: string, validatorAddress?: string, provider: string) => {
     const { data: pendingRequests, isLoading: isLoadingPending } = useQuery({
         queryKey: ["getWithdrawalRequests", provider, adress, validatorAddress],
@@ -21,7 +22,7 @@ export const useWithdrawals = (adress: string, validatorAddress?: string, provid
             return await earnSDK.getClaimableRequests({
                 address: adress,
                 validatorAddress: validatorAddress,
-                provider: provider
+                provider: provider,
             });
         },
         enabled: !!adress,
