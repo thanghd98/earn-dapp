@@ -55,6 +55,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@lidofinance/lido-ethereum-sdk": "^4.5.0"
+    "@lidofinance/lido-ethereum-sdk": "^4.5.0",
+    "@chorus-one/ethereum": "2.0.4"
   }
 }

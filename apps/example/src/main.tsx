@@ -1,6 +1,5 @@
 import './index.css'
 import App from './App.tsx'
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { hoodi } from 'wagmi/chains'
@@ -22,21 +21,20 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
+
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
      <BrowserRouter>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <SkeletonTheme baseColor="#202020" highlightColor="#444">
-              <Header />
-              <App />
-              <Footer />
-              <ToastContainer />
+                <Header />
+                <App />
+                <Footer />
+                <ToastContainer />
             </SkeletonTheme>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </BrowserRouter>
-  </StrictMode>,
 )
